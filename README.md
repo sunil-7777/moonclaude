@@ -1,157 +1,97 @@
-# MoonClaude
+# MoonClaude 🌙
 
-MoonClaude is "Moon for Claude": use Claude Code with external LLMs through a LiteLLM proxy while keeping project-local memory and simple CLI ergonomics.
+**Moon for Claude**: Run [Claude Code](https://github.com/anthropics/claude-code) fully autonomously on external LLMs (e.g. Qwen, Gemini, MiniMax, OpenAI) through a LiteLLM proxy, while enjoying **zero-downtime hot reloading** and an **Antigravity-grade persistent AI memory** engine.
 
-Backward compatibility is preserved:
-- `claude-ext` command still works.
-- Legacy `~/.claude-ext` config is migrated into `~/.moonclaude` when needed.
+---
 
-## Install
+## 🚀 Features
 
+- **Free OpenRouter Models**: Interactively fetch and route your prompts through any of the 25+ completely free models on OpenRouter, or configure your own premium API keys (Gemini, Groq, OpenAI).
+- **True Zero-Downtime Hot Reloading**: Press `Alt+M` directly in the proxy terminal to instantaneously swap the active model. MoonClaude dynamically intercepts the routing under the hood—no proxy restarts, no lost context in the CLI, no downtime.
+- **Antigravity-Grade Project Memory**:
+  - Auto-discovers and enforces `MOONCLAUDE.md` global project instructions into Claude Code's system prompts.
+  - Generates cross-session, highly structured summarization context representing your recent AI coding sessions, intelligently managing your AI's working context without maxing out open files.
+  - Easily browse transcripts natively with `moon history`.
+
+---
+
+## 📦 Installation & Setup
+
+### 1. Prerequisites 
+If you haven't already, you need `Node.js` installed to run Anthropic's official Claude Code CLI.
 ```bash
-pip install moonclaude
+# Install Claude Code globally via npm
+npm install -g @anthropic-ai/claude-code
 ```
 
-From source:
-
+### 2. Install MoonClaude
+Install MoonClaude directly from GitHub using pip:
 ```bash
-git clone https://github.com/yourname/moonclaude
-cd moonclaude
-pip install -e .
+pip install git+https://github.com/sunil-7777/moonclaude.git
 ```
 
-## Quick Start
-
-1. Run setup:
-
+### 3. Initialize Settings
+Run the interactive setup wizard to map your API keys (OpenRouter, Gemini, Groq) and select your preferred chat models.
 ```bash
 moon setup
 ```
 
-2. Launch with one command (auto-start proxy + Claude):
+---
 
+## 🏃 Quick Start
+
+The easiest way to launch the proxy and jump straight into Claude Code is a single command. Open your project folder and run:
 ```bash
 moon
 ```
+*(If you haven't run setup yet, it will guide you through it first!)*
 
-That is the easiest path. You can still run manual steps if you want explicit control:
+**Manual Control:**
+If you prefer running the Proxy and Claude independently, open two terminals:
+- **Terminal 1**: Run `moon start` (Starts the LiteLLM routing proxy)
+- **Terminal 2**: Run `moon chat` (Launches Claude Code seamlessly attached to the proxy)
 
-```bash
-moon start
-moon chat
-```
+---
 
-If MoonClaude is not configured yet, `moon` will run setup first and then continue into chat.
-
-## Core Commands
+## 🎛️ Core Commands
 
 ```text
-moon setup                  Interactive setup
-moon                        Quick launch (setup if missing, then chat)
-moon chat                   Launch Claude (auto-proxy on by default)
-moon start                  Start LiteLLM proxy in foreground
-moon status                 Show current model, proxy state, memory paths
-moon models                 List provider models
-moon switch [model_id]      Switch active model among configured models
-moon prompt ...             Manage persistent default prompt
-moon env --shell powershell Print helper commands for a shell
+moon setup                  Interactive wizard for API keys and preferred models
+moon                        Quick launch (starts proxy in background, then launches Claude)
+moon chat                   Launch Claude connected to the proxy
+moon start                  Start LiteLLM proxy in the foreground with live token monitoring
+moon switch                 Fast CLI model switcher 
+moon history                Interactive rich browser for your past conversation logs
+moon memory                 Detailed control over the project memory context engine
+moon status                 Display system health, active models, and paths
 ```
 
-You can also use:
-- `moonclaude ...` (full command name)
-- `claude-ext ...` (legacy command alias)
+> **Compatibility**: MoonClaude preserves the old `claude-ext ...` legacy command aliases. Your legacy `~/.claude-ext` config will automatically migrate to `~/.moonclaude/` at launch!
 
-## Model Catalog
+---
 
-OpenRouter free text models are fetched live from:
+## ♻️ Zero-Downtime Hot Reloading
 
-`https://openrouter.ai/api/v1/models`
+When you are deep in a Claude Code debug session, discovering your chosen model is failing can be frustrating.
 
-MoonClaude caches this catalog in:
+Instead of dropping context:
+1. Keep the proxy running in the foreground (`moon start`).
+2. Press `Alt+M`. 
+3. Select a new LLM from your interactive UI overlay.
+4. MoonClaude dynamically pre-warms its internal router injection without dropping the proxy connection. Your next prompt in the Claude Code terminal instantly bridges over to the new model!
 
-`~/.moonclaude/openrouter-models.json`
+---
 
-If live fetch is unavailable, setup and model listing fall back to cached data.
+## 🧠 Memory Engine
 
-## Model Switching
+MoonClaude injects long-term memory into Claude Code.
 
-Setup can store multiple models in `configured_models`. Switch active model instantly:
+1. **`MOONCLAUDE.md`**: Place this file in your project root. MoonClaude automatically reads it and appends it to your AI's persistent context across all sessions.
+2. **Context Compression**: When you boot `moon chat`, MoonClaude evaluates your last 20 sessions and constructs an elegant, compressed timeline of files you've modified, goals you've accomplished, and context you shouldn't forget.
+3. **Session Replay**: Type `moon history` to explore Rich-formatted logs of all of your previous AI code iterations.
 
-```bash
-moon switch
-moon switch qwen/qwen3.6-plus:free
-```
-
-After switching, restart proxy if it is already running so aliases update immediately:
-
-```bash
-moon start
-```
-
-## Persistent Default Prompt
-
-You can keep a default instruction that is appended to every launched Claude session:
-
-```bash
-moon prompt show
-moon prompt set "Always prefer concise answers with actionable steps."
-moon prompt enable
-moon prompt disable
-moon prompt clear
-```
-
-This instruction is merged with project memory context at launch time.
-
-## Token Visibility in Proxy Logs
-
-MoonClaude registers a LiteLLM callback (`moonclaude.proxy_logging.moon_usage_logger`) that prints:
-- per-request short request/response labels
-- prompt tokens and completion tokens
-- running summary totals
-
-These lines appear in proxy output while LiteLLM is running.
-
-## Startup Performance Notes
-
-MoonClaude reduces startup friction by:
-- auto-starting proxy when you run `moon` or `moon chat` (unless disabled)
-- caching generated memory summary when local transcript set has not changed
-- avoiding rewriting helper scripts unless content changed
-
-## Generated Files
-
-Primary config folder:
-
-`~/.moonclaude/`
-
-Key files:
-- `litellm.yaml`
-- `.env`
-- `config.json`
-- `default-prompt.txt`
-- `proxy.log`
-- `run-moon.*`, `load-env.*`, `start-proxy.*`
-
-Legacy compatibility helper names (`run-claude.*`) are still generated.
-
-## Migration from claude-ext
-
-MoonClaude migrates from `~/.claude-ext` when `~/.moonclaude` does not exist yet:
-- `litellm.yaml`
-- `.env`
-- `config.json`
-- model cache
-- helper scripts
-- project memory folder
-
-You can continue using the old command:
-
-```bash
-claude-ext status
-```
-
-It now routes to MoonClaude.
+---
 
 ## License
 
-MIT
+MIT 
