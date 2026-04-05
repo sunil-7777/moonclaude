@@ -702,7 +702,15 @@ def run_start() -> None:
     else:
         key_env = _key_env_from_litellm_model(active_model.get("litellm_model", "openrouter/unknown"))
     migrate_litellm_config(config_path)
-    sync_all_configured_models_to_yaml(state)
+    
+    # Pre-register EVERYTHING from the free catalog so hot-switching never fails
+    try:
+        from .models import load_openrouter_free_models
+        full_catalog, _ = load_openrouter_free_models()
+    except Exception:
+        full_catalog = None
+        
+    sync_all_configured_models_to_yaml(state, full_catalog=full_catalog)
     ensure_proxy_callback_module(config_path)
 
     _, env = _load_saved_env(state)

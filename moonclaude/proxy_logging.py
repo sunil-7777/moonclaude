@@ -46,9 +46,18 @@ class MoonUsageLogger(CustomLogger):  # type: ignore[misc]
             litellm_model = active.get("litellm_model", f"openrouter/{model_id}")
             data["model"] = litellm_model
             
+            # Disable LiteLLM's automatic failover/retry logic for this request.
+            # We want to stick to the chosen model even if it's rate-limited.
+            data.setdefault("metadata", {})["no-failover"] = True
+            
             # Map API key directly into kwargs, bypassing the stale litellm.yaml definitions
             if litellm_model.startswith("openrouter/"):
                 data["api_key"] = os.environ.get("OPENROUTER_API_KEY")
+                # OpenRouter free models require these headers to avoid "no healthy deployments" or 403s
+                data.setdefault("extra_headers", {}).update({
+                    "HTTP-Referer": "https://github.com/sunil/moonclaude",
+                    "X-Title": "MoonClaude CLI",
+                })
             elif litellm_model.startswith("gemini/"):
                 data["api_key"] = os.environ.get("GEMINI_API_KEY")
             elif litellm_model.startswith("groq/"):
@@ -133,10 +142,12 @@ class MoonUsageLogger(CustomLogger):  # type: ignore[misc]
             msg = re.sub(r'^litellm\.[a-zA-Z]+Error:\s*', '', msg)
             msg = re.sub(r'^[a-zA-Z]+Exception -\s*', '', msg)
             
-            # Remove proxy trailing status info
-            msg = re.sub(r'\s*Passed model=.*$', '', msg)
+            # Remove proxy trailing status info without swallowing the actual message
+            msg = re.sub(r'(?:you )?passed in model=[^\s,]+', '', msg, flags=re.IGNORECASE)
             
-            return msg.strip()
+            # Clean up punctuation and whitespace
+            msg = msg.strip(". -: ")
+            return msg or "failed"
 
         error_msg = _extract_error_message(exc)
 
@@ -160,14 +171,22 @@ def _extract_model(kwargs, response_obj) -> str:
     model = _obj_or_dict(response_obj, "model")
     
     # Fallback to the provider-specific target embedded deep in Litellm kwarg routings
+    # This is usually where the hook-modified model ends up
     if not model and isinstance(kwargs, dict):
         params = kwargs.get("litellm_params", {})
         if isinstance(params, dict) and params.get("model"):
             model = params.get("model")
             
-    # Absolute final fallback to the top-level alias (e.g., 'claude-opus-4-6')
+    # Also check the direct 'model' in kwargs - LiteLLM might have updated it from our hook
     if not model and isinstance(kwargs, dict):
         model = kwargs.get("model")
+        
+    # If the model is still a Claude alias, it means it failed BEFORE the hook or the hook didn't run.
+    # But often in failure logs, we WANT to see the target model.
+    # We can try to peek at the state file if we are desperate, but that's slow.
+    # For now, let's just clean up the output if it's an OpenRouter path.
+    if model and isinstance(model, str) and model.startswith("openrouter/"):
+        model = model.replace("openrouter/", "")
         
     return str(model or "unknown")
 

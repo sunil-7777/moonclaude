@@ -90,7 +90,7 @@ def _migrate_legacy_config_dir() -> None:
             pass
 
 
-def build_litellm_config(primary_model: dict, extra_models: list, api_keys: dict, port: int) -> dict:
+def build_litellm_config(primary_model: dict, extra_models: list, api_keys: dict, port: int, full_catalog: list | None = None) -> dict:
     model_list = []
 
     params = {
@@ -111,9 +111,20 @@ def build_litellm_config(primary_model: dict, extra_models: list, api_keys: dict
         model_list.append({"model_name": alias, "litellm_params": dict(params)})
 
     # Register all available models natively so the dynamic router can hit them without error
-    for m in [primary_model] + extra_models:
+    # We include EVERY model from the catalog so seamless switching never hits "no healthy deployments"
+    registry = [primary_model] + extra_models
+    if full_catalog:
+        registry += full_catalog
+        
+    seen_model_names = set()
+    for m in registry:
+        m_name = m["litellm_model"]
+        if m_name in seen_model_names:
+            continue
+        seen_model_names.add(m_name)
+        
         m_params = {
-            "model": m["litellm_model"],
+            "model": m_name,
             "api_key": f"os.environ/{_key_env_for(m, api_keys)}",
             "extra_body": {
                 "provider": {
@@ -125,11 +136,19 @@ def build_litellm_config(primary_model: dict, extra_models: list, api_keys: dict
                 "X-Title": "MoonClaude CLI",
             },
         }
-        # LiteLLM router will use this `model_name` key precisely when we assign it dynamically
         model_list.append({
-            "model_name": m["litellm_model"],
+            "model_name": m_name,
             "litellm_params": m_params
         })
+        
+        # Also register model_id as an alias if it differs
+        m_id = m["model_id"]
+        if m_id != m_name and m_id not in seen_model_names:
+            model_list.append({
+                "model_name": m_id,
+                "litellm_params": m_params
+            })
+            seen_model_names.add(m_id)
 
     return {
         "model_list": model_list,
@@ -139,7 +158,12 @@ def build_litellm_config(primary_model: dict, extra_models: list, api_keys: dict
         "litellm_settings": {
             "drop_params": True,
             "set_verbose": False,
+            "watch_config": True,
             "callbacks": ["moonclaude.proxy_logging.moon_usage_logger"],
+        },
+        "router_settings": {
+            "routing_strategy": "simple-shuffle",
+            "disable_cooldowns": True,
         },
     }
 
@@ -257,9 +281,13 @@ def switch_primary_model(new_model: dict, state: dict) -> dict:
     config.setdefault("general_settings", {})["completion_model"] = CLAUDE_ALIASES[0]
     config.setdefault("litellm_settings", {})["drop_params"] = True
     config.setdefault("litellm_settings", {})["set_verbose"] = False
+    config.setdefault("litellm_settings", {})["watch_config"] = True
     config.setdefault("litellm_settings", {}).setdefault("callbacks", [])
     if "moonclaude.proxy_logging.moon_usage_logger" not in config["litellm_settings"]["callbacks"]:
         config["litellm_settings"]["callbacks"].append("moonclaude.proxy_logging.moon_usage_logger")
+
+    config.setdefault("router_settings", {})["routing_strategy"] = "simple-shuffle"
+    config.setdefault("router_settings", {})["disable_cooldowns"] = True
 
     # Write config
     with open(config_path, "w", encoding="utf-8") as handle:
@@ -419,7 +447,7 @@ def migrate_litellm_config(path: Path | str) -> bool:
     return changed
 
 
-def sync_all_configured_models_to_yaml(state: dict) -> None:
+def sync_all_configured_models_to_yaml(state: dict, full_catalog: list | None = None) -> None:
     """Inject all known models into litellm.yaml so the dynamic router finds them."""
     config_path = Path(state.get("config_path", str(LITELLM_CONFIG_PATH)))
     if not config_path.exists():
@@ -430,7 +458,12 @@ def sync_all_configured_models_to_yaml(state: dict) -> None:
     api_keys = {}
     _, env = _load_env(state)
     changed = False
-    for model in state.get("configured_models", []):
+    
+    registry = list(state.get("configured_models", []))
+    if full_catalog:
+        registry += full_catalog
+        
+    for model in registry:
         model_name = model["litellm_model"]
         if model_name not in models_dict:
             m_params = {
@@ -453,6 +486,18 @@ def sync_all_configured_models_to_yaml(state: dict) -> None:
             models_dict[model_name] = True
             changed = True
             
+    # Ensure hot-reload settings are preserved
+    litellm_settings = config.setdefault("litellm_settings", {})
+    if litellm_settings.get("watch_config") is not True:
+        litellm_settings["watch_config"] = True
+        changed = True
+
+    router_settings = config.setdefault("router_settings", {})
+    if router_settings.get("disable_cooldowns") is not True:
+        router_settings["disable_cooldowns"] = True
+        router_settings["routing_strategy"] = "simple-shuffle"
+        changed = True
+
     if changed:
         with open(config_path, "w", encoding="utf-8") as handle:
             yaml.dump(config, handle, default_flow_style=False, sort_keys=False, allow_unicode=True)

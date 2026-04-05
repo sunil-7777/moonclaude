@@ -167,7 +167,13 @@ def run_setup():
         warn(f"Invalid port. Using default {DEFAULT_PORT}.")
 
     extra_models = [m for m in configured_models if m["model_id"] != primary_model["model_id"]]
-    litellm_config = build_litellm_config(primary_model, extra_models, api_keys, port)
+    litellm_config = build_litellm_config(
+        primary_model,
+        extra_models,
+        api_keys,
+        port,
+        full_catalog=models if provider_name == "OpenRouter" else None
+    )
     config_path = write_litellm_config(litellm_config)
     env_path = write_env_file(api_keys, port)
     write_helper_scripts(port, config_path=config_path, env_path=env_path)
