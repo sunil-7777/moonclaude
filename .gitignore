@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs
+.vscode/
+.idea/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.env
+
+# Build files
+dist/
+build/
+*.egg-info/
+
+# MoonClaude config overrides (optional/safe to ignore if any sneak in)
+.claude.json
