@@ -55,6 +55,19 @@ def show_update_message(latest_version: str) -> None:
     console.print("\n")
 
 
+def show_up_to_date_message() -> None:
+    """Display a subtle up-to-date message."""
+    from rich.console import Console
+    from rich.text import Text
+    console = Console()
+    msg = Text.assemble(
+        ("✦ ", "#a855f7"),
+        ("MoonClaude is up to date! ", "dim green"),
+        (f"(v{__version__})", "dim"),
+    )
+    console.print(msg)
+
+
 def check_for_updates(force: bool = False) -> None:
     """Check for updates if the interval has passed."""
     if not force:
@@ -70,7 +83,7 @@ def check_for_updates(force: bool = False) -> None:
     if not latest:
         return
 
-    # Persist the check time even if no update found to respect interval
+    # Persist the check time even if no update found
     try:
         CONFIG_DIR.mkdir(parents=True, exist_ok=True)
         LAST_CHECK_FILE.write_text(str(time.time()))
@@ -78,6 +91,6 @@ def check_for_updates(force: bool = False) -> None:
         pass
 
     if latest != __version__:
-        # Simple version comparison (works for standard SEMVER)
-        # For more complex stuff we'd use packaging.version, but we keep deps low.
         show_update_message(latest)
+    else:
+        show_up_to_date_message()
