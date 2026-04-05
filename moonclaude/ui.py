@@ -64,6 +64,13 @@ def banner() -> None:
         console.print(f"[{color}]{line}[/]")
     console.print()
 
+    # Check for updates in the background (throttled to 24h)
+    try:
+        from .updates import check_for_updates
+        check_for_updates()
+    except Exception:
+        pass
+
 def info(msg: str) -> None:
     console.print(f" [{T_INFO}]✦[/] {msg}")
 
