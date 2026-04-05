@@ -25,9 +25,9 @@ npm install -g @anthropic-ai/claude-code
 ```
 
 ### 2. Install MoonClaude
-Install MoonClaude directly from GitHub using pip:
+MoonClaude is available directly on PyPI!
 ```bash
-pip install git+https://github.com/sunil-7777/moonclaude.git
+pip install moonclaude
 ```
 
 ### 3. Initialize Settings
@@ -42,7 +42,7 @@ moon setup
 
 The easiest way to launch the proxy and jump straight into Claude Code is a single command. Open your project folder and run:
 ```bash
-moon
+moon launch
 ```
 *(If you haven't run setup yet, it will guide you through it first!)*
 
@@ -57,13 +57,14 @@ If you prefer running the Proxy and Claude independently, open two terminals:
 
 ```text
 moon setup                  Interactive wizard for API keys and preferred models
-moon                        Quick launch (starts proxy in background, then launches Claude)
+moon launch                 Quick launch (starts proxy in background, then launches Claude)
 moon chat                   Launch Claude connected to the proxy
 moon start                  Start LiteLLM proxy in the foreground with live token monitoring
 moon switch                 Fast CLI model switcher 
 moon history                Interactive rich browser for your past conversation logs
 moon memory                 Detailed control over the project memory context engine
 moon status                 Display system health, active models, and paths
+moon                        Show CLI help and commands
 ```
 
 > **Compatibility**: MoonClaude preserves the old `claude-ext ...` legacy command aliases. Your legacy `~/.claude-ext` config will automatically migrate to `~/.moonclaude/` at launch!
