@@ -135,6 +135,8 @@ class _MoonEventRenderer:
             import re
             # Completely strip <system-reminder> blocks and their content (Claude Code injects this constantly)
             cleaned = re.sub(r"<system-reminder>.*?</system-reminder>", "", text, flags=re.DOTALL | re.IGNORECASE)
+            # Strip thought blocks (DeepSeek, etc) so they don't pollute the preview
+            cleaned = re.sub(r"<(think|thought)>.*?</\1>", "", cleaned, flags=re.DOTALL | re.IGNORECASE)
             # Strip bare tags
             cleaned = re.sub(r"<[^>]+>", "", cleaned).strip()
             words = cleaned.split()
@@ -609,45 +611,22 @@ def _configured_models(state: dict) -> list[dict]:
 
 def _start_proxy_background(state: dict, env: dict) -> bool:
     port = int(state.get("port", DEFAULT_PORT))
-    config_path = state.get("config_path", str(LITELLM_CONFIG_PATH))
-    ensure_proxy_callback_module(config_path)
-    command = ["litellm", "--config", str(config_path), "--port", str(port)]
-
-    log_path = CONFIG_DIR / "proxy.log"
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-
-    try:
-        handle = open(log_path, "a", encoding="utf-8")
-    except OSError:
-        handle = open(os.devnull, "w", encoding="utf-8")
-
-    try:
-        kwargs = {
-            "env": env,
-            "stdout": handle,
-            "stderr": subprocess.STDOUT,
-            "text": True,
-            "encoding": "utf-8",
-            "errors": "replace",
-        }
-        if os.name == "nt":
-            creationflags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS
-            process = subprocess.Popen(command, creationflags=creationflags, **kwargs)
-        else:
-            process = subprocess.Popen(command, start_new_session=True, **kwargs)
-    except FileNotFoundError:
-        error("litellm not found. Install it with: pip install 'litellm[proxy]'")
-        return False
-    finally:
-        handle.close()
+    
+    if os.name == "nt":
+        subprocess.Popen(["start", "cmd", "/k", "moon start"], shell=True)
+    elif sys.platform == "darwin":
+        subprocess.Popen(["osascript", "-e", 'tell app "Terminal" to do script "moon start"'])
+    else:
+        for term in ["x-terminal-emulator", "gnome-terminal", "konsole", "xterm"]:
+            if subprocess.call(["which", term], stdout=subprocess.DEVNULL) == 0:
+                subprocess.Popen([term, "-e", "moon start"])
+                break
 
     for _ in range(40):
         if _proxy_is_up(port):
-            state["proxy_pid"] = process.pid
+            state.pop("proxy_pid", None)
             write_state(state)
             return True
-        if process.poll() is not None:
-            break
         time.sleep(0.25)
 
     return _proxy_is_up(port)
