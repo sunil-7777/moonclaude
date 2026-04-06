@@ -44,8 +44,8 @@
       <span class="code-line"><span class="code-comment"># Setup your free OpenRouter API keys or Gemini keys</span></span>
       <span class="code-line"><span class="prompt">$</span><span class="command"> moon setup</span></span>
       <br>
-      <span class="code-line"><span class="code-comment"># Launch Claude Code seamlessly connected to your free models</span></span>
-      <span class="code-line"><span class="prompt">$</span><span class="command"> moon launch</span></span>
+      <span class="code-line"><span class="code-comment"># Leave proxy running here, run `moon chat` in a new terminal</span></span>
+      <span class="code-line"><span class="prompt">$</span><span class="command"> moon start</span></span>
     </div>
   </header>
 
@@ -95,8 +95,8 @@
         <span class="code-line"><span class="code-comment"># Configure models, API keys, and memory</span></span>
         <span class="code-line"><span class="prompt">$</span><span class="command"> moon setup</span></span>
         <br>
-        <span class="code-line"><span class="code-comment"># Start the proxy and open Claude seamlessly</span></span>
-        <span class="code-line"><span class="prompt">$</span><span class="command"> moon launch</span></span>
+        <span class="code-line"><span class="code-comment"># Start proxy (Terminal 1) and run moon chat (Terminal 2)</span></span>
+        <span class="code-line"><span class="prompt">$</span><span class="command"> moon start</span></span>
       </div>
     </div>
   </section>
@@ -119,8 +119,6 @@
       <p>Never run <code>claude</code> directly if you want it to be free. Always launch your environment with:</p>
       <div class="terminal" style="margin:1rem 0; padding:1rem;">
         <span class="code-line"><span class="prompt">$</span><span class="command"> moon chat</span></span>
-        <span class="code-line"><span class="code-comment"># OR</span></span>
-        <span class="code-line"><span class="prompt">$</span><span class="command"> moon launch</span></span>
       </div>
       <p>MoonClaude sets local HTTP proxy environmental variables (under the hood) to seamlessly override Anthropic's endpoints. Your prompts instantly hit Gemini, Llama, or Qwen instances instead securely!</p>
     </div>
