@@ -42,16 +42,21 @@ moon setup
 
 ## 🏃 Quick Start
 
-The easiest way to launch the proxy and jump straight into Claude Code is a single command. Open your project folder and run:
-```bash
-moon launch
-```
-*(If you haven't run setup yet, it will guide you through it first!)*
+For the best experience—where you can actively monitor API calls, token usage, and seamlessly hot-reload models—we recommend running the proxy in its own terminal.
 
-**Manual Control:**
-If you prefer running the Proxy and Claude independently, open two terminals:
-- **Terminal 1**: Run `moon start` (Starts the LiteLLM routing proxy)
-- **Terminal 2**: Run `moon chat` (Launches Claude Code seamlessly attached to the proxy)
+**1. Start the Proxy Server (Terminal 1)**
+```bash
+moon start
+```
+*Leave this terminal open. You will see live API logs and can press `Alt+M` here to dynamically hot-reload your active LLM model without dropping Claude's context.*
+
+**2. Launch Claude Code (Terminal 2)**
+Open a **new** terminal window and run:
+```bash
+moon chat
+```
+
+*(Note: A legacy `moon launch` command exists, but the dual-terminal approach is recommended so you don't lose sight of the proxy's logs).*
 
 ---
 
