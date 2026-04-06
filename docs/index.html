@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Optimization -->
+  <title>MoonClaude - Free Models & Autonomous Proxy for Claude Code</title>
+  <meta name="description" content="MoonClaude is a zero-downtime hot-reloading proxy that allows you to run Anthropic's Claude Code fully autonomously using free or custom external LLMs.">
+  <meta name="keywords" content="moonclaude, claude for moon, claude for free, claude code alternative, openrouter claude code, claude code free models">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <div class="container">
+    <nav>
+      <div class="logo">🌙 MoonClaude</div>
+      <a href="https://github.com/sunil-7777/moonclaude" class="github-link">GitHub</a>
+    </nav>
+  </div>
+
+  <!-- Hero Section -->
+  <header class="hero container">
+    <h1>Claude for Free.<br>Claude for Moon.</h1>
+    <p>Run <strong>Claude Code</strong> fully autonomously on external LLMs (Qwen, Gemini, MiniMax, OpenAI) via a proxy, with <strong>zero-downtime hot reloading</strong> and an Antigravity-grade persistent AI memory engine.</p>
+    
+    <div class="btn-group">
+      <a href="#quick-start" class="btn btn-primary">Get Started</a>
+      <a href="#bypass-guide" class="btn btn-outline">Bypassing Restrictions</a>
+    </div>
+
+    <!-- Terminal Demo -->
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+      <span class="code-line"><span class="code-comment"># Install moonclaude</span></span>
+      <span class="code-line"><span class="prompt">$</span><span class="command"> pip install moonclaude</span></span>
+      <br>
+      <span class="code-line"><span class="code-comment"># Setup your free OpenRouter API keys or Gemini keys</span></span>
+      <span class="code-line"><span class="prompt">$</span><span class="command"> moon setup</span></span>
+      <br>
+      <span class="code-line"><span class="code-comment"># Launch Claude Code seamlessly connected to your free models</span></span>
+      <span class="code-line"><span class="prompt">$</span><span class="command"> moon launch</span></span>
+    </div>
+  </header>
+
+  <!-- Features -->
+  <section class="container" id="features">
+    <h2 class="section-title">Why MoonClaude?</h2>
+    <div class="features">
+      <div class="card">
+        <h3>🆓 Free OpenRouter Models</h3>
+        <p>Interactively fetch and route your prompts through any of the 25+ completely free models on OpenRouter, or configure premium API keys (Gemini, Groq, OpenAI).</p>
+      </div>
+      <div class="card">
+        <h3>⚡ Zero-Downtime Reloading</h3>
+        <p>Press <code>Alt+M</code> in the proxy terminal to instantaneously swap the active model. MoonClaude dynamically intercepts the routing under the hood—no restarts, no lost context.</p>
+      </div>
+      <div class="card">
+        <h3>🧠 Memory Engine</h3>
+        <p>Auto-discovers and enforces <code>MOONCLAUDE.md</code> instructions into Claude Code. Compresses your last 20 sessions to maintain context without maxing out open files limits.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Guide -->
+  <section class="container" id="quick-start">
+    <h2 class="section-title">Installation & Setup Guide</h2>
+    
+    <div class="guide-step">
+      <h4>1. Install Claude Code CLI</h4>
+      <p>MoonClaude connects to the official Anthropic Claude CLI. Make sure you have Node.js installed, then install Claude globally: <a href="https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview" style="color:var(--secondary)">Official Anthropic Docs</a></p>
+      <div class="terminal" style="margin:1rem 0; padding:1rem;">
+        <span class="code-line"><span class="prompt">$</span><span class="command"> npm install -g @anthropic-ai/claude-code</span></span>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <h4>2. Install MoonClaude</h4>
+      <p>MoonClaude is deployed as a Python package. We highly recommend using <code>pipx</code> or global pip.</p>
+      <div class="terminal" style="margin:1rem 0; padding:1rem;">
+        <span class="code-line"><span class="prompt">$</span><span class="command"> pip install moonclaude</span></span>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <h4>3. Setup & Launch</h4>
+      <p>Follow the interactive CLI wizard, then drop right into your workflow.</p>
+      <div class="terminal" style="margin:1rem 0; padding:1rem;">
+        <span class="code-line"><span class="code-comment"># Configure models, API keys, and memory</span></span>
+        <span class="code-line"><span class="prompt">$</span><span class="command"> moon setup</span></span>
+        <br>
+        <span class="code-line"><span class="code-comment"># Start the proxy and open Claude seamlessly</span></span>
+        <span class="code-line"><span class="prompt">$</span><span class="command"> moon launch</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Subverting Restrictions Guide -->
+  <section class="container" id="bypass-guide">
+    <h2 class="section-title">Bypassing Claude Restrictions</h2>
+    
+    <div class="guide-step">
+      <h4>Authenticating Successfully</h4>
+      <p>Claude Code by default only supports Anthropic models and requires an active initial authentication to their servers. <strong>To use MoonClaude, you must authenticate once via the official CLI:</strong></p>
+      <div class="terminal" style="margin:1rem 0; padding:1rem;">
+        <span class="code-line"><span class="prompt">$</span><span class="command"> claude login</span></span>
+      </div>
+      <p>Follow the browser prompt to log into your Anthropic Developer account. Don't worry—MoonClaude will route the actual requests away from Anthropic to your selected free providers instead.</p>
+    </div>
+
+    <div class="guide-step">
+      <h4>Routing Through MoonClaude</h4>
+      <p>Never run <code>claude</code> directly if you want it to be free. Always launch your environment with:</p>
+      <div class="terminal" style="margin:1rem 0; padding:1rem;">
+        <span class="code-line"><span class="prompt">$</span><span class="command"> moon chat</span></span>
+        <span class="code-line"><span class="code-comment"># OR</span></span>
+        <span class="code-line"><span class="prompt">$</span><span class="command"> moon launch</span></span>
+      </div>
+      <p>MoonClaude sets local HTTP proxy environmental variables (under the hood) to seamlessly override Anthropic's endpoints. Your prompts instantly hit Gemini, Llama, or Qwen instances instead securely!</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>© 2026 MoonClaude Project. MIT Licensed. Not affiliated with Anthropic.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

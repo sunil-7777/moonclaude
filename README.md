@@ -2,6 +2,8 @@
 
 **Moon for Claude**: Run [Claude Code](https://github.com/anthropics/claude-code) fully autonomously on external LLMs (e.g. Qwen, Gemini, MiniMax, OpenAI) through a LiteLLM proxy, while enjoying **zero-downtime hot reloading** and an **Antigravity-grade persistent AI memory** engine.
 
+🌐 **[Visit the Official Landing Page](https://sunil-7777.github.io/moonclaude/)** for interactive setup guides and documentation.
+
 ---
 
 ## 🚀 Features
@@ -90,6 +92,30 @@ MoonClaude injects long-term memory into Claude Code.
 1. **`MOONCLAUDE.md`**: Place this file in your project root. MoonClaude automatically reads it and appends it to your AI's persistent context across all sessions.
 2. **Context Compression**: When you boot `moon chat`, MoonClaude evaluates your last 20 sessions and constructs an elegant, compressed timeline of files you've modified, goals you've accomplished, and context you shouldn't forget.
 3. **Session Replay**: Type `moon history` to explore Rich-formatted logs of all of your previous AI code iterations.
+
+---
+
+## 🛡️ Bypassing Claude Restrictions
+
+Claude Code by default only supports Anthropic models and requires an active initial authentication to their servers. **To use MoonClaude, you must authenticate once via the official CLI:**
+
+```bash
+claude login
+```
+
+Follow the browser prompt to log into your Anthropic Developer account. Don't worry—MoonClaude will route the actual requests away from Anthropic to your selected free providers instead.
+
+### Routing Through MoonClaude
+
+To ensure you don't hit Anthropic's paid API, never run `claude` directly. Always launch your environment with:
+
+```bash
+moon chat
+# OR
+moon launch
+```
+
+MoonClaude sets local HTTP proxy environmental variables (under the hood) to seamlessly override Anthropic's endpoints. Your prompts instantly hit Gemini, Llama, or Qwen instances safely and securely!
 
 ---
 
