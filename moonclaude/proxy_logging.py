@@ -297,7 +297,9 @@ def _first_user_message(messages) -> str:
 def _extract_text(content) -> str:
     import re
     def _strip_reminders(t: str) -> str:
-        return re.sub(r"<system-reminder>.*?</system-reminder>", "", t, flags=re.DOTALL | re.IGNORECASE)
+        t = re.sub(r"<system-reminder>.*?</system-reminder>", "", t, flags=re.DOTALL | re.IGNORECASE)
+        t = re.sub(r"<(think|thought)>.*?</\1>", "", t, flags=re.DOTALL | re.IGNORECASE)
+        return t
 
     if isinstance(content, str):
         return " ".join(_strip_reminders(content).split())

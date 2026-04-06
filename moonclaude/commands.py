@@ -613,7 +613,8 @@ def _start_proxy_background(state: dict, env: dict) -> bool:
     port = int(state.get("port", DEFAULT_PORT))
     
     if os.name == "nt":
-        subprocess.Popen(["start", "cmd", "/k", "moon start"], shell=True)
+        # Use string for Popen on Windows with shell=True for better 'start' support
+        subprocess.Popen(f'start cmd /k "moon start"', shell=True)
     elif sys.platform == "darwin":
         subprocess.Popen(["osascript", "-e", 'tell app "Terminal" to do script "moon start"'])
     else:
@@ -682,14 +683,8 @@ def run_start() -> None:
         key_env = _key_env_from_litellm_model(active_model.get("litellm_model", "openrouter/unknown"))
     migrate_litellm_config(config_path)
     
-    # Pre-register EVERYTHING from the free catalog so hot-switching never fails
-    try:
-        from .models import load_openrouter_free_models
-        full_catalog, _ = load_openrouter_free_models()
-    except Exception:
-        full_catalog = None
-        
-    sync_all_configured_models_to_yaml(state, full_catalog=full_catalog)
+    # Sync only the explicitly configured models to the LiteLLM YAML
+    sync_all_configured_models_to_yaml(state)
     ensure_proxy_callback_module(config_path)
 
     _, env = _load_saved_env(state)
@@ -775,7 +770,7 @@ def run_chat(args: list[str] | None = None) -> None:
         error(f"{key_env} not set. Run: moon setup")
         sys.exit(1)
 
-    auto_proxy = True
+    auto_proxy = False
     claude_args = []
     for arg in list(args or []):
         if arg == "--no-auto-proxy":
@@ -791,7 +786,15 @@ def run_chat(args: list[str] | None = None) -> None:
         if not _ensure_proxy_running(state, env):
             sys.exit(1)
     elif not _proxy_is_up(port):
-        warn("Proxy does not appear to be running. Start it manually with: moon start")
+        # Proxy not yet up — could have just been spawned by moon launch.
+        # Wait up to 30s for it to come online before proceeding.
+        info("Waiting for proxy to come online...")
+        for _ in range(120):
+            if _proxy_is_up(port):
+                break
+            time.sleep(0.25)
+        else:
+            warn("Proxy did not start in time. Start it with: moon start")
 
     project_root = detect_project_root()
     settings_path, memory_dir = ensure_project_settings(project_root)
@@ -849,7 +852,33 @@ def run_launch(args: list[str] | None = None) -> None:
             error("Setup did not produce a valid configuration.")
             sys.exit(1)
 
-    run_chat(["--auto-proxy", *(args or [])])
+    port = int(state.get("port", DEFAULT_PORT))
+    _, env = _load_saved_env(state)
+    env = _prepare_proxy_env(env)
+
+    # Dumbass-proof verification print
+    info(f"[{T_INFO}] Moon Launch v2.1.3 (Dual-Terminal Mode) active...")
+
+    # If proxy not yet up, spawn moon chat in a new visible terminal window,
+    # then run moon start in THIS terminal (foreground, with full logs).
+    if not _proxy_is_up(port):
+        chat_cmd = f"moon chat {' '.join(args or '')}".strip()
+        if os.name == "nt":
+            # Use string for Popen on Windows for reliable 'start' behavior
+            subprocess.Popen(f'start cmd /k "{chat_cmd}"', shell=True)
+        elif sys.platform == "darwin":
+            subprocess.Popen(["osascript", "-e", f'tell app "Terminal" to do script "{chat_cmd}"'])
+        else:
+            for term in ["x-terminal-emulator", "gnome-terminal", "konsole", "xterm"]:
+                if subprocess.call(["which", term], stdout=subprocess.DEVNULL) == 0:
+                    subprocess.Popen([term, "-e", f"bash -c '{chat_cmd}'"])
+                    break
+
+        # Now keep proxy in this terminal
+        run_start()
+    else:
+        # Proxy already up — just run chat in the current terminal
+        run_chat([*(args or [])])
 
 
 def run_history(args: list[str] | None = None) -> None:

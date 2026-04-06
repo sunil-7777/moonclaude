@@ -90,7 +90,7 @@ def _migrate_legacy_config_dir() -> None:
             pass
 
 
-def build_litellm_config(primary_model: dict, extra_models: list, api_keys: dict, port: int, full_catalog: list | None = None) -> dict:
+def build_litellm_config(primary_model: dict, extra_models: list, api_keys: dict, port: int) -> dict:
     model_list = []
 
     params = {
@@ -110,12 +110,8 @@ def build_litellm_config(primary_model: dict, extra_models: list, api_keys: dict
     for alias in CLAUDE_ALIASES:
         model_list.append({"model_name": alias, "litellm_params": dict(params)})
 
-    # Register all available models natively so the dynamic router can hit them without error
-    # We include EVERY model from the catalog so seamless switching never hits "no healthy deployments"
+    # Only register models that are explicitly in the configured_models list
     registry = [primary_model] + extra_models
-    if full_catalog:
-        registry += full_catalog
-        
     seen_model_names = set()
     for m in registry:
         m_name = m["litellm_model"]
@@ -447,8 +443,8 @@ def migrate_litellm_config(path: Path | str) -> bool:
     return changed
 
 
-def sync_all_configured_models_to_yaml(state: dict, full_catalog: list | None = None) -> None:
-    """Inject all known models into litellm.yaml so the dynamic router finds them."""
+def sync_all_configured_models_to_yaml(state: dict) -> None:
+    """Inject only explicitly configured models into litellm.yaml."""
     config_path = Path(state.get("config_path", str(LITELLM_CONFIG_PATH)))
     if not config_path.exists():
         return
@@ -460,9 +456,6 @@ def sync_all_configured_models_to_yaml(state: dict, full_catalog: list | None = 
     changed = False
     
     registry = list(state.get("configured_models", []))
-    if full_catalog:
-        registry += full_catalog
-        
     for model in registry:
         model_name = model["litellm_model"]
         if model_name not in models_dict:

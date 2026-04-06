@@ -8,7 +8,7 @@
 
 ## 🚀 Features
 
-- **Free OpenRouter Models**: Interactively fetch and route your prompts through any of the 25+ completely free models on OpenRouter, or configure your own premium API keys (Gemini, Groq, OpenAI).
+- **Lean & Stable Routing**: MoonClaude now uses a "Lazy Injection" strategy—it only registers the models you select. This prevents rate-limit spikes and "no deployments available" errors by keeping the LiteLLM router lean and stable.
 - **True Zero-Downtime Hot Reloading**: Press `Alt+M` directly in the proxy terminal to instantaneously swap the active model. MoonClaude dynamically intercepts the routing under the hood—no proxy restarts, no lost context in the CLI, no downtime.
 - **Antigravity-Grade Project Memory**:
   - Auto-discovers and enforces `MOONCLAUDE.md` global project instructions into Claude Code's system prompts.
@@ -40,23 +40,20 @@ moon setup
 
 ---
 
-## 🏃 Quick Start
+## 🏃 Quick Start (Dual-Terminal Mode)
 
-For the best experience—where you can actively monitor API calls, token usage, and seamlessly hot-reload models—we recommend running the proxy in its own terminal.
+MoonClaude works best when you can see the API logs in real-time. We've automated this into a seamless **Dual-Terminal** workflow.
 
-**1. Start the Proxy Server (Terminal 1)**
+**The Recommended Path:**
+Simply run the following command in your project directory:
 ```bash
-moon start
+moon launch
 ```
-*Leave this terminal open. You will see live API logs and can press `Alt+M` here to dynamically hot-reload your active LLM model without dropping Claude's context.*
+**What happens next?**
+1. **This terminal** transforms into the MoonClaude Proxy log viewer. You'll see every API call, token count, and latency metric here. You can also press `Alt+M` here to swap models instantly.
+2. **A new terminal window** will automatically pop up and launch `claude` (Claude Code) linked to the proxy.
 
-**2. Launch Claude Code (Terminal 2)**
-Open a **new** terminal window and run:
-```bash
-moon chat
-```
-
-*(Note: A legacy `moon launch` command exists, but the dual-terminal approach is recommended so you don't lose sight of the proxy's logs).*
+You're now ready to code with full visibility!
 
 ---
 

@@ -19,19 +19,19 @@ from .branding import CONFIG_DIR, LEGACY_CONFIG_DIR
 LEGACY_MODEL_MIGRATIONS = {
     "qwen/qwen3-235b-a22b:free": {
         "name": "Qwen 3.6 Plus (Free)",
-        "model_id": "qwen/qwen3.6-plus:free",
-        "litellm_model": "openrouter/qwen/qwen3.6-plus:free",
+        "model_id": "qwen/qwen3.6-plus-04-02:free",
+        "litellm_model": "openrouter/qwen/qwen3.6-plus-04-02:free",
     },
-    "qwen/qwen3-235b-a22b": {
-        "name": "Qwen 3.6 Plus",
-        "model_id": "qwen/qwen3.6-plus",
-        "litellm_model": "openrouter/qwen/qwen3.6-plus",
+    "qwen/qwen3.6-plus:free": {
+        "name": "Qwen 3.6 Plus (Free)",
+        "model_id": "qwen/qwen3.6-plus-04-02:free",
+        "litellm_model": "openrouter/qwen/qwen3.6-plus-04-02:free",
     },
 }
 
 LEGACY_LITELLM_MODEL_MIGRATIONS = {
-    "openrouter/qwen/qwen3-235b-a22b:free": "openrouter/qwen/qwen3.6-plus:free",
-    "openrouter/qwen/qwen3-235b-a22b": "openrouter/qwen/qwen3.6-plus",
+    "openrouter/qwen/qwen3-235b-a22b:free": "openrouter/qwen/qwen3.6-plus-04-02:free",
+    "openrouter/qwen/qwen3.6-plus:free": "openrouter/qwen/qwen3.6-plus-04-02:free",
 }
 
 OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"

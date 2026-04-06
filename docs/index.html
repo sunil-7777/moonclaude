@@ -41,11 +41,11 @@
       <span class="code-line"><span class="code-comment"># Install moonclaude</span></span>
       <span class="code-line"><span class="prompt">$</span><span class="command"> pip install moonclaude</span></span>
       <br>
-      <span class="code-line"><span class="code-comment"># Setup your free OpenRouter API keys or Gemini keys</span></span>
-      <span class="code-line"><span class="prompt">$</span><span class="command"> moon setup</span></span>
+      <span class="code-line"><span class="code-comment"># Automatically spawns Dual-Terminal Mode!</span></span>
+      <span class="code-line"><span class="prompt">$</span><span class="command"> moon launch</span></span>
       <br>
-      <span class="code-line"><span class="code-comment"># Leave proxy running here, run `moon chat` in a new terminal</span></span>
-      <span class="code-line"><span class="prompt">$</span><span class="command"> moon start</span></span>
+      <span class="code-line"><span class="code-comment"># Logs appear in this window, Claude in a new window.</span></span>
+      <span class="code-line"><span class="prompt">proxy $</span><span class="command"> [Req 0001] AI: Hello! How can I...</span></span>
     </div>
   </header>
 
@@ -54,8 +54,8 @@
     <h2 class="section-title">Why MoonClaude?</h2>
     <div class="features">
       <div class="card">
-        <h3>🆓 Free OpenRouter Models</h3>
-        <p>Interactively fetch and route your prompts through any of the 25+ completely free models on OpenRouter, or configure premium API keys (Gemini, Groq, OpenAI).</p>
+        <h3>🛡️ Lean & Stable Routing</h3>
+        <p>MoonClaude uses "Lazy Injection"—registering only the models you select. This prevents rate-limit spikes and ensures stable connections to free OpenRouter providers.</p>
       </div>
       <div class="card">
         <h3>⚡ Zero-Downtime Reloading</h3>
@@ -63,7 +63,7 @@
       </div>
       <div class="card">
         <h3>🧠 Memory Engine</h3>
-        <p>Auto-discovers and enforces <code>MOONCLAUDE.md</code> instructions into Claude Code. Compresses your last 20 sessions to maintain context without maxing out open files limits.</p>
+        <p>Auto-discovers <code>MOONCLAUDE.md</code> instructions. Compresses your last 20 sessions to maintain context without maxing out open files limits.</p>
       </div>
     </div>
   </section>
@@ -90,13 +90,13 @@
 
     <div class="guide-step">
       <h4>3. Setup & Launch</h4>
-      <p>Follow the interactive CLI wizard, then drop right into your workflow.</p>
+      <p>Follow the interactive CLI wizard, then drop right into your workflow with automated Dual-Terminal Mode.</p>
       <div class="terminal" style="margin:1rem 0; padding:1rem;">
         <span class="code-line"><span class="code-comment"># Configure models, API keys, and memory</span></span>
         <span class="code-line"><span class="prompt">$</span><span class="command"> moon setup</span></span>
         <br>
-        <span class="code-line"><span class="code-comment"># Start proxy (Terminal 1) and run moon chat (Terminal 2)</span></span>
-        <span class="code-line"><span class="prompt">$</span><span class="command"> moon start</span></span>
+        <span class="code-line"><span class="code-comment"># Launch with automated Dual-Terminal Mode</span></span>
+        <span class="code-line"><span class="prompt">$</span><span class="command"> moon launch</span></span>
       </div>
     </div>
   </section>
@@ -118,9 +118,9 @@
       <h4>Routing Through MoonClaude</h4>
       <p>Never run <code>claude</code> directly if you want it to be free. Always launch your environment with:</p>
       <div class="terminal" style="margin:1rem 0; padding:1rem;">
-        <span class="code-line"><span class="prompt">$</span><span class="command"> moon chat</span></span>
+        <span class="code-line"><span class="prompt">$</span><span class="command"> moon launch</span></span>
       </div>
-      <p>MoonClaude sets local HTTP proxy environmental variables (under the hood) to seamlessly override Anthropic's endpoints. Your prompts instantly hit Gemini, Llama, or Qwen instances instead securely!</p>
+      <p>MoonClaude sets local HTTP proxy environmental variables (under the hood) to seamlessly override Anthropic's endpoints. Your prompts instantly hit Gemini, Llama, or Qwen instances safely!</p>
     </div>
   </section>
 
